@@ -125,7 +125,7 @@ function getNeighbors(item) {
   var neighbors = new Array();
   var row = item.row;
   var  col = item.col;
-
+  // NEED TO FIND A BETTER WAY TO DO THIS, THINKING OF CHECKING THE 8 ADJACENT MATRIX NODES 
   if (isBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
   if (isBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
   if (isBlocked(row, col + 1)) neighbors.push(createItem(row, col + 1, item));
