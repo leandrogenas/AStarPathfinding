@@ -5,15 +5,14 @@ var destinationCol;
 var closedList = new Array();
 var openList = new Array();
 var matrix = [];
-var neighborRecord;
 var startCol;
 var startRow;
 matrix = [
   // 0  1  2  3  4  5  6  7  8  9
-    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
     [1, 1, 1, 0, 1, 1, 1, 1, 1, 1], // 1
     [1, 1, 1, 0, 1, 1, 0, 1, 0, 1], // 2
-    [0, 0, 1, 0, 1, 0, 0, 0, 0, 1], // 3
+    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], // 3
     [1, 1, 1, 0, 1, 1, 1, 0, 1, 1], // 4
     [1, 0, 1, 1, 1, 1, 0, 1, 0, 1], // 5
     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1], // 6
@@ -22,12 +21,13 @@ matrix = [
   ];
 
 function generateMatrix() {
-  var item = createItem(startRow, startCol, matrix[startRow][startCol], 0)
+  var item = createItem(startRow, startCol, 0);
   insertIntoOpenList(item);
 }
 
-function getHCost(row, col) { //MANHATAN HEURISTIC
-  return Math.floor((Math.sqrt((row - destinationRow) * (row - destinationRow) + (col - destinationCol) * (col - destinationCol))));
+function getHCost(row, col) { //EUCLIDEAN HEURISTIC
+ // return Math.floor((Math.sqrt((row - destinationRow) * (row - destinationRow) + (col - destinationCol) * (col - destinationCol))));
+ return (Math.abs(row - destinationRow) + Math.abs(col - destinationCol));
 }
 
 function start() {
@@ -35,7 +35,7 @@ function start() {
   startRow = parseInt(startRow, 10);
   startCol = document.getElementById('startCol').value;
   startCol = parseInt(startCol, 10)
-  if(isBlocked(startRow, startCol) == false){
+  if(isnNotBlocked(startRow, startCol) == false){
     throw new Error("Please give a valid row and col values!");
   }
 
@@ -48,27 +48,26 @@ function start() {
     generateMatrix();
   }
 
-  while (Object.keys(openList[0]).length !== 0) {
+  while (openList.length !== 0) {
     bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
       break;
-    } else if (isValid(bestItem.row, bestItem.col)) {
+    } else if (isValid(bestItem.row, bestItem.col)  && isnNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
       insertIntoClosedList(bestItem);
       var neighbors = getNeighbors(bestItem)
       for (i = 0; i < neighbors.length; i++) {
-        var cost = neighbors[i].fCost;
-        var fCost = neighbors[i].fCost;
+        var cost = bestItem.gCost + neighbors[i].gCost;
 
-        neighborRecord = isInClosedList(neighbors[i]);
-        if (neighborRecord && cost >= neighborRecord.fCost){
+        var neighborRecord = isInClosedList(neighbors[i]);
+        if (neighborRecord && cost >= neighborRecord.gCost){
           continue;
         }
 
         neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord || cost < neighborRecord.fCost) {
+        if (!neighborRecord || cost < neighborRecord.gCost ) {
           if (!neighborRecord) {
             insertIntoOpenList(neighbors[i]);
           } else {
@@ -124,16 +123,16 @@ function getBestOpen() {
 function getNeighbors(item) {
   var neighbors = new Array();
   var row = item.row;
-  var  col = item.col;
+  var col = item.col;
   // NEED TO FIND A BETTER WAY TO DO THIS, THINKING OF CHECKING THE 8 ADJACENT MATRIX NODES 
-  if (isBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
-  if (isBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
-  if (isBlocked(row, col + 1)) neighbors.push(createItem(row, col + 1, item));
-  if (isBlocked(row, col - 1)) neighbors.push(createItem(row, col - 1, item));
+  if (isnNotBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
+  if (isnNotBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
+  if (isnNotBlocked(row, col + 1)) neighbors.push(createItem(row, col + 1, item));
+  if (isnNotBlocked(row, col - 1)) neighbors.push(createItem(row, col - 1, item));
   return neighbors;
 }
 
-function isBlocked(row, col) {
+function isnNotBlocked(row, col) {
   if(isValid(row, col)){
     if (matrix[row][col] == 1) {
       return true;
@@ -144,11 +143,10 @@ function isBlocked(row, col) {
 
 function createItem(row, col, parentItem){
   if(isValid(row, col)){
-    isWall = matrix[row][col];
-    gCost = parentItem.gCost + 1 || 1;
+    gCost = parentItem.gCost + 1 || 0;
     hCost = getHCost(row, col);
     fCost = gCost + hCost;
-    var item = new Item(isWall, gCost, hCost, fCost, row, col, parentItem);
+    var item = new Item(gCost, hCost, fCost, row, col, parentItem);
     return item;
   } 
   throw new Error("Please give a valid row and col values!");
@@ -175,7 +173,7 @@ return false;
 function createPath(item) {
   madePath = new Array();
   madePath2 = new Array();
-  while (item.parent !== 1) {
+  while (item.parent !== 0) {
     madePath.push(item);
     madePath2.push({ "ROW": item.row, "COL": item.col });
     item = item.parent;
@@ -186,8 +184,7 @@ function createPath(item) {
 }
 
 class Item {
-  constructor(isWall, gCost, hCost, fCost, row, col, parent) {
-    this.isWall = isWall;
+  constructor(gCost, hCost, fCost, row, col, parent) {
     this.gCost = gCost;
     this.hCost = hCost;
     this.fCost = fCost;
