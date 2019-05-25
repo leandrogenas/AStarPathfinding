@@ -1,60 +1,151 @@
-var ROW = 9;
-var COL = 10;
+//CANVAS VARIABLES
+var canvas = document.getElementById("canvas");
+var c = canvas.getContext("2d");
+var boxSize = 30;
+var boxes = Math.floor(600 / boxSize);
+canvas.addEventListener('click', handleClick);
+c.globalAlpha = 0.8
+
+//ROWS AND COLUMNS VARIABLES
+var ROW = 20;
+var COL = 20;
 var destinationRow;
 var destinationCol;
-var closedList = new Array();
-var openList = new Array();
-var matrix = [];
 var startCol;
 var startRow;
-matrix = [
-  // 0  1  2  3  4  5  6  7  8  9
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
-    [1, 1, 1, 0, 1, 1, 1, 1, 1, 1], // 1
-    [1, 1, 1, 0, 1, 1, 0, 1, 0, 1], // 2
-    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0], // 3
-    [1, 1, 1, 0, 1, 1, 1, 0, 1, 1], // 4
-    [1, 0, 1, 1, 1, 1, 0, 1, 0, 1], // 5
-    [1, 0, 0, 0, 0, 1, 0, 0, 0, 1], // 6
-    [1, 0, 1, 1, 1, 1, 0, 0, 0, 1], // 7
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 8
-  ];
+
+//GENERAL VARIABLES
+var typeOfClick;
+var closedList = new Array();
+var openList = new Array();
+var blockedItens = new Set();
+var matrix = [];
+
+
+function drawBox() {
+  c.beginPath();
+  c.fillStyle = "white";
+  c.lineWidth = 3;
+  c.strokeStyle = 'black';
+  for (var row = 0; row < boxes; row++) {
+    for (var column = 0; column < boxes; column++) {
+      var x = column * boxSize;
+      var y = row * boxSize;
+      c.rect(x, y, boxSize, boxSize);
+      c.fill();
+      c.stroke();
+    }
+  }
+  c.closePath();
+
+}
+
+function setStart() {
+  typeOfClick = 1;
+}
+
+function setEnd() {
+  typeOfClick = 2;
+}
+
+function setBlocked() {
+  typeOfClick = 3;
+}
+
+function setClear() {
+  location.reload(true);
+}
+
+function startPathfinding() {
+  start(startRow, startCol, destinationRow, destinationCol, blockedItens);
+}
+
+
+function handleClick(e) {
+  if(typeOfClick === 1){
+    c.fillStyle = "red";
+
+    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
+    Math.floor(e.offsetY / boxSize) * boxSize,
+    boxSize, boxSize);
+    startRow = (Math.floor(e.y / boxSize));
+    startCol = (Math.floor(e.x / boxSize));
+  }
+  else if(typeOfClick === 2){
+    c.fillStyle = "yellow";
+
+    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
+    Math.floor(e.offsetY / boxSize) * boxSize,
+    boxSize, boxSize);
+
+    destinationRow = (Math.floor(e.y / boxSize));
+    destinationCol = (Math.floor(e.x / boxSize));
+  }
+  else if(typeOfClick === 3){
+    c.fillStyle = "black";
+
+    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
+    Math.floor(e.offsetY / boxSize) * boxSize,
+    boxSize, boxSize);
+
+    row = (Math.floor(e.y / boxSize));
+    col = (Math.floor(e.x / boxSize));
+    var matrix = [row, col];
+    blockedItens.add(matrix)
+  }
+
+}
+
+drawBox();
+
+function setHasBlockedItem(row, col){
+  var blockOrNot = 1;
+  blockedItens.forEach(item => {
+    if(item[0] == row && item[1] == col){
+      blockOrNot = 0;
+    }
+  });
+  return blockOrNot;
+}
 
 function generateMatrix() {
-  var item = createItem(startRow, startCol, 0);
+  for (var y = 0; y < ROW; y++) {
+    matrix[y] = [];
+    for (var x = 0; x < COL; x++) {
+      if(setHasBlockedItem(y, x)){
+        matrix[y][x] = 1;
+      } else {
+        matrix[y][x] = 0;
+      }
+    }
+  }
+  var item = createItem(startRow, startCol, 0)
   insertIntoOpenList(item);
 }
 
-function getHCost(row, col) { //EUCLIDEAN HEURISTIC
- // return Math.floor((Math.sqrt((row - destinationRow) * (row - destinationRow) + (col - destinationCol) * (col - destinationCol))));
- return (Math.abs(row - destinationRow) + Math.abs(col - destinationCol));
+function getHCost(row, col) { //MANHATAN HEURISTIC
+  //return Math.floor((Math.sqrt((row - destinationRow) * (row - destinationRow) + (col - destinationCol) * (col - destinationCol)))); EUCLIDEAN
+  return (Math.abs(row - destinationRow) + Math.abs(col - destinationCol));
 }
 
-function start() {
-  startRow = document.getElementById('startRow').value;
-  startRow = parseInt(startRow, 10);
-  startCol = document.getElementById('startCol').value;
-  startCol = parseInt(startCol, 10)
-  if(isnNotBlocked(startRow, startCol) == false){
-    throw new Error("Please give a valid row and col values!");
-  }
+function start(startR, startC, destinationR, destinationC, blockedI) {
 
-  destinationRow = document.getElementById('textareaRow').value;
-  destinationRow = parseInt(destinationRow, 10);
-  destinationCol = document.getElementById('textareaCol').value;
-  destinationCol = parseInt(destinationCol, 10)
-
-  if (isValid(destinationRow, destinationCol)) {
-    generateMatrix();
-  }
+  startRow = startR;
+  startCol = startC;
+  destinationRow = destinationR;
+  destinationCol = destinationC;
+  blockedItens = blockedI;
+  generateMatrix();
 
   while (openList.length !== 0) {
     bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
+      openList = new Array();
+      closedList = new Array();
       break;
-    } else if (isValid(bestItem.row, bestItem.col)  && isnNotBlocked(bestItem.row, bestItem.col)) {
+    } else if (isValid(bestItem.row, bestItem.col) && isNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
       insertIntoClosedList(bestItem);
       var neighbors = getNeighbors(bestItem)
@@ -67,7 +158,7 @@ function start() {
         }
 
         neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord || cost < neighborRecord.gCost ) {
+        if (!neighborRecord || cost < neighborRecord.gCost) {
           if (!neighborRecord) {
             insertIntoOpenList(neighbors[i]);
           } else {
@@ -79,7 +170,6 @@ function start() {
       }
     }
   }
-
 }
 
 
@@ -94,10 +184,12 @@ function isDestination(row, col) {
 
 function insertIntoOpenList(item) {
   openList.push(item);
+
 }
 
 function insertIntoClosedList(item) {
   closedList.push(item);
+
 }
 
 
@@ -116,7 +208,6 @@ function getBestOpen() {
       bestI = i;
     }
   }
-
   return openList[bestI];
 }
 
@@ -124,15 +215,15 @@ function getNeighbors(item) {
   var neighbors = new Array();
   var row = item.row;
   var col = item.col;
-  // NEED TO FIND A BETTER WAY TO DO THIS, THINKING OF CHECKING THE 8 ADJACENT MATRIX NODES 
-  if (isnNotBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
-  if (isnNotBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
-  if (isnNotBlocked(row, col + 1)) neighbors.push(createItem(row, col + 1, item));
-  if (isnNotBlocked(row, col - 1)) neighbors.push(createItem(row, col - 1, item));
+
+  if (isNotBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
+  if (isNotBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
+  if (isNotBlocked(row, col + 1)) neighbors.push(createItem(row, col + 1, item));
+  if (isNotBlocked(row, col - 1)) neighbors.push(createItem(row, col - 1, item));
   return neighbors;
 }
 
-function isnNotBlocked(row, col) {
+function isNotBlocked(row, col) {
   if(isValid(row, col)){
     if (matrix[row][col] == 1) {
       return true;
@@ -148,7 +239,7 @@ function createItem(row, col, parentItem){
     fCost = gCost + hCost;
     var item = new Item(gCost, hCost, fCost, row, col, parentItem);
     return item;
-  } 
+  }
   throw new Error("Please give a valid row and col values!");
 }
 
@@ -158,7 +249,7 @@ function isInOpenList(item){
       return openList[i];
     }
   }
-return false;
+  return false;
 }
 
 function isInClosedList(item){
@@ -167,20 +258,17 @@ function isInClosedList(item){
       return closedList[i];
     }
   }
-return false;
+  return false;
 }
 
 function createPath(item) {
   madePath = new Array();
-  madePath2 = new Array();
   while (item.parent !== 0) {
     madePath.push(item);
-    madePath2.push({ "ROW": item.row, "COL": item.col });
     item = item.parent;
   }
-  madePath2 = madePath2.reverse();
-  console.log(madePath);
-  console.log(madePath2);
+  madePath = madePath.reverse();
+  drawPath(madePath);
 }
 
 class Item {
@@ -192,4 +280,29 @@ class Item {
     this.col = col;
     this.parent = parent;
   }
+}
+
+function drawPath(madePath) {
+  console.log("The best path using the euclidean heuristic is:" );
+  madePath.map(item => {
+    console.log(`Row: ${item.row} | Col: ${item.col}`);
+    c.fillStyle = "blue";
+    c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+  });
+
+//  openList.map(item => {
+  //  if(item.row !== destinationRow && item.col !== destinationCol){
+    //  c.fillStyle = "green";
+     // c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    //}
+   
+//  });
+
+  //closedList.map(item => {
+    //if(item.row !== destinationRow && item.col !== destinationCol){
+      //c.fillStyle = "black";
+      //c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    //}
+ // });
+
 }
