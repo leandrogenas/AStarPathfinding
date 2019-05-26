@@ -1,14 +1,33 @@
+<!doctype html>
 <html>
+<title>A* Search Algorithm</title>
+<style>
+  body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  div {
+    font-family: arial;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
+</head>
+
 <body>
-<script type="text/javascript" src="controller.js">
-
-
-</script>
-<textarea id="startRow" placeholder="Matrix Row to start from"></textarea>
-<textarea id="startCol" placeholder="Matrix Col to start from"></textarea>
-<br>
-<textarea id="textareaRow" placeholder="Matrix Row to go"></textarea>
-<textarea id="textareaCol" placeholder="Matrix Col to go"></textarea>
-<button  onclick="start();" > Start </button>
+    <canvas id="canvas" width="600px" height="600px"></canvas>
+    <script type='text/javascript' src='controller.js' type="module">
+    </script>
+    <br>
+    <button id="start" onClick="setStart();"> Set Start </button>
+    <button id="end"onClick="setEnd();"> Set End </button>
+    <button id="block" onClick="setBlocked();"> Set Wall </button>
+    <button id="click" onClick="setClear();"> Clear </button>
+    <button id="click" onClick="startPathfinding();"> Start </button>
 </body>
+
 </html>
