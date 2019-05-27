@@ -142,8 +142,6 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
-      openList = new Array();
-      closedList = new Array();
       break;
     } else if (isValid(bestItem.row, bestItem.col) && isNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
@@ -169,6 +167,10 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
         }
       }
     }
+  }
+
+  if(openList.length == 0 ){
+    throw new Error("Could not find path")
   }
 }
 
@@ -290,19 +292,19 @@ function drawPath(madePath) {
     c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
   });
 
-//  openList.map(item => {
-  //  if(item.row !== destinationRow && item.col !== destinationCol){
-    //  c.fillStyle = "green";
-     // c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
-    //}
-   
-//  });
+  closedList.map(item => {
+    if(!madePath.includes(item)){
+      c.fillStyle = "green";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    }
+  });
 
-  //closedList.map(item => {
-    //if(item.row !== destinationRow && item.col !== destinationCol){
-      //c.fillStyle = "black";
-      //c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
-    //}
- // });
+  openList.map(item => {
+    if(!madePath.includes(item)){
+      c.fillStyle = "purple";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    }
+  });
+
 
 }
