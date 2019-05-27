@@ -168,7 +168,7 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
     }
   }
   if(openList.length == 0){
-    throw new Error("Could not find path")
+    return;
   }
 }
 
