@@ -129,7 +129,6 @@ function getHCost(row, col) { //MANHATAN HEURISTIC
 }
 
 function start(startR, startC, destinationR, destinationC, blockedI) {
-
   startRow = startR;
   startCol = startC;
   destinationRow = destinationR;
@@ -142,8 +141,6 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
-      openList = new Array();
-      closedList = new Array();
       break;
     } else if (isValid(bestItem.row, bestItem.col) && isNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
@@ -169,6 +166,9 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
         }
       }
     }
+  }
+  if(openList.length == 0){
+    return;
   }
 }
 
@@ -283,26 +283,30 @@ class Item {
 }
 
 function drawPath(madePath) {
-  console.log("The best path using the euclidean heuristic is:" );
+  console.log("The best path using the manhatan heuristic is:" );
   madePath.map(item => {
     console.log(`Row: ${item.row} | Col: ${item.col}`);
-    c.fillStyle = "blue";
-    c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    if(!(item.row == destinationRow && item.col == destinationCol)){
+      c.fillStyle = "blue";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    }
+
   });
 
-//  openList.map(item => {
-  //  if(item.row !== destinationRow && item.col !== destinationCol){
-    //  c.fillStyle = "green";
-     // c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
-    //}
-   
-//  });
+  closedList.map(item => {
+    if(!madePath.includes(item) && !(item.row == startRow && item.col == startCol)){
+      c.fillStyle = "green";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    }
+  });
 
-  //closedList.map(item => {
-    //if(item.row !== destinationRow && item.col !== destinationCol){
-      //c.fillStyle = "black";
-      //c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
-    //}
- // });
-
+  openList.map(item => {
+    if(!madePath.includes(item)){
+      c.fillStyle = "purple";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    }
+  });
+  closedList = new Array();
+  openList = new Array();
+  return;
 }
