@@ -1,7 +1,5 @@
 # AStarPathfinding
-A Star Pathfinding Algorithm
+Pathfinding Algorithm Visualization
 
-<h2>A * (Star) a very used pathfinding algorithm made using only JS<h2>
+<h2>A * (Star) and Best First commonly used pathfinding algorithm's made using Js/NodeJs<h2>
 <br>
-Done for Universidade Estadual de Campinas discipline Artificial Intelligence
-
