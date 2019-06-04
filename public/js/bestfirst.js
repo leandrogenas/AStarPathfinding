@@ -212,14 +212,14 @@ function drawPath(madePath) {
 
   closedList.map(item => {
     if(!madePath.includes(item) && !(item.row == startRow && item.col == startCol)){
-      c.fillStyle = "rgb(128,128,0)";
+      c.fillStyle = "green";//"rgb(128,128,0)";
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
     }
   });
 
   openList.map(item => {
     if(!madePath.includes(item)){
-      c.fillStyle = "rgb(34,139,34)";
+      c.fillStyle =  "purple";// "rgb(34,139,34)";
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
     }
   });
