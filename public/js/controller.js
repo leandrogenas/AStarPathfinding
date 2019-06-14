@@ -1,38 +1,37 @@
-// var bestFirstStart = require('./bestfirst.js');
-// var aStarStart = require('./astar.js');
-
 import { aStarStart } from "./astar.js";
 import { bestFirstStart } from "./bestfirst.js";
 
 //CANVAS VARIABLES
-var canvas = document.getElementById("canvas");
-var c = canvas.getContext("2d");
-var boxSize = 30;
-var boxes = Math.floor(600 / boxSize);
+let canvas = document.getElementById("canvas");
+let c = canvas.getContext("2d");
+let boxSize = 30;
+let boxes = Math.floor(600 / boxSize);
 canvas.addEventListener('click', handleClick);
 c.globalAlpha = 0.8
 
 //ROWS AND COLUMNS VARIABLES
-var ROW = 20;
-var COL = 20;
-var destinationRow;
-var destinationCol;
-var startCol;
-var startRow;
+let destinationRow;
+let destinationCol;
+let startCol;
+let startRow;
 
 //GENERAL VARIABLES
-var typeOfClick;
-var blockedItens = new Set();
+let typeOfClick;
+let blockedItens = new Set();
+let contStart = new Array();
+let contEnd = new Array();
+let endI = 0;
+let startI = 0;
 
 function drawBox() {
   c.beginPath();
   c.fillStyle = "white";
   c.lineWidth = 3;
   c.strokeStyle = 'black';
-  for (var row = 0; row < boxes; row++) {
-    for (var column = 0; column < boxes; column++) {
-      var x = column * boxSize;
-      var y = row * boxSize;
+  for (let row = 0; row < boxes; row++) {
+    for (let column = 0; column < boxes; column++) {
+      let x = column * boxSize;
+      let y = row * boxSize;
       c.rect(x, y, boxSize, boxSize);
       c.fill();
       c.stroke();
@@ -66,23 +65,55 @@ buttonClear.addEventListener('click', () => {
 
 function handleClick(e) {
   if(typeOfClick === 1){
-    c.fillStyle = "red";
+    if(startI === 0) {
+      c.fillStyle = "red";
+      c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
+      Math.floor(e.offsetY / boxSize) * boxSize,
+      boxSize, boxSize);
+      startRow = (Math.floor(e.y / boxSize));
+      startCol = (Math.floor(e.x / boxSize));
 
-    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
-    Math.floor(e.offsetY / boxSize) * boxSize,
-    boxSize, boxSize);
-    startRow = (Math.floor(e.y / boxSize));
-    startCol = (Math.floor(e.x / boxSize));
+
+      let row = (e.offsetX);
+      let col = (e.offsetY);
+      let matrix = [row, col];
+      contStart.push(matrix);
+
+      startI++;
+    } else {
+      c.fillStyle = "white";
+      c.clearRect(Math.floor(contStart[0][0]/ boxSize) * boxSize,
+      Math.floor(contStart[0][1] / boxSize) * boxSize,
+      boxSize, boxSize);
+      c.stroke();
+      contStart = new Array();
+      startI--;
+    }
   }
   else if(typeOfClick === 2){
-    c.fillStyle = "yellow";
+    if(endI === 0) {
+      c.fillStyle = "yellow";
+      c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
+      Math.floor(e.offsetY / boxSize) * boxSize,
+      boxSize, boxSize);
 
-    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
-    Math.floor(e.offsetY / boxSize) * boxSize,
-    boxSize, boxSize);
+      let row = (e.offsetX);
+      let col = (e.offsetY);
+      let matrix = [row, col];
+      contEnd.push(matrix)
+      destinationRow = (Math.floor(e.y / boxSize));
+      destinationCol = (Math.floor(e.x / boxSize));
 
-    destinationRow = (Math.floor(e.y / boxSize));
-    destinationCol = (Math.floor(e.x / boxSize));
+      endI++;
+    } else {
+      c.fillStyle = "white";
+      c.clearRect(Math.floor(contEnd[0][0]/ boxSize) * boxSize,
+      Math.floor(contEnd[0][1] / boxSize) * boxSize,
+      boxSize, boxSize);
+      c.stroke();
+      contEnd = new Array();
+      endI--;
+    }
   }
   else if(typeOfClick === 3){
     c.fillStyle = "black";
@@ -91,9 +122,9 @@ function handleClick(e) {
     Math.floor(e.offsetY / boxSize) * boxSize,
     boxSize, boxSize);
 
-    var row = (Math.floor(e.y / boxSize));
-    var col = (Math.floor(e.x / boxSize));
-    var matrix = [row, col];
+    let row = (Math.floor(e.y / boxSize));
+    let col = (Math.floor(e.x / boxSize));
+    let matrix = [row, col];
     blockedItens.add(matrix)
   }
 
