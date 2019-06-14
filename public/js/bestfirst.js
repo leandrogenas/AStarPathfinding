@@ -1,27 +1,36 @@
 //CANVAS VARIABLES
-var canvas = document.getElementById("canvas");
-var c = canvas.getContext("2d");
-var boxSize = 30;
-var boxes = Math.floor(600 / boxSize);
-c.globalAlpha = 0.8
+let canvas = document.getElementById("canvas");
+let c = canvas.getContext("2d")
+let boxSize = 30;
+c.globalAlpha = 0.2
 
 //ROWS AND COLUMNS VARIABLES
-var ROW = 20;
-var COL = 20;
-var destinationRow;
-var destinationCol;
-var startCol;
-var startRow;
+let ROW = 20;
+let COL = 20;
+let destinationRow;
+let destinationCol;
+let startCol;
+let startRow;
 
 //GENERAL VARIABLES
-var closedList = new Array();
-var openList = new Array();
-var blockedItens = new Set();
-var matrix = [];
+let closedList = new Array();
+let openList = new Array();
+let blockedItens = new Set();
+let matrix = [];
+
+//ITEM CLASS
+class Item {
+  constructor(hCost, row, col, parent) {
+    this.hCost = hCost;
+    this.row = row;
+    this.col = col;
+    this.parent = parent;
+  }
+}
 
 
 function setHasBlockedItem(row, col){
-  var blockOrNot = 1;
+  let blockOrNot = 1;
   blockedItens.forEach(item => {
     if(item[0] == row && item[1] == col){
       blockOrNot = 0;
@@ -31,9 +40,9 @@ function setHasBlockedItem(row, col){
 }
 
 function generateMatrix() {
-  for (var y = 0; y < ROW; y++) {
+  for (let y = 0; y < ROW; y++) {
     matrix[y] = [];
-    for (var x = 0; x < COL; x++) {
+    for (let x = 0; x < COL; x++) {
       if(setHasBlockedItem(y, x)){
         matrix[y][x] = 1;
       } else {
@@ -41,7 +50,7 @@ function generateMatrix() {
       }
     }
   }
-  var item = createItem(startRow, startCol, 0)
+  let item = createItem(startRow, startCol, 0)
   insertIntoOpenList(item);
 }
 
@@ -59,8 +68,9 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
   blockedItens = blockedI;
   generateMatrix();
 
+
   while (openList.length !== 0) {
-    var bestItem = getBestOpen();
+    let bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
@@ -70,11 +80,11 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
     } else if (isNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
       insertIntoClosedList(bestItem);
-      var neighbors = getNeighbors(bestItem)
-      for (var i = 0; i < neighbors.length; i++) {
-        var cost = bestItem.hCost + neighbors[i].hCost;
+      let neighbors = getNeighbors(bestItem)
+      for (let i = 0; i < neighbors.length; i++) {
+        let cost = bestItem.hCost + neighbors[i].hCost;
 
-        var neighborRecord = isInClosedList(neighbors[i]);
+        let neighborRecord = isInClosedList(neighbors[i]);
         if (neighborRecord && cost >= neighborRecord.hCost){
           continue;
         }
@@ -90,7 +100,13 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
         }
       }
     }
+    if(openList.length == 0){
+      console.log("Couldn't find a path with best-first");
+      return;
+    }
   }
+
+
 }
 
 
@@ -115,7 +131,7 @@ function insertIntoClosedList(item) {
 
 
 function removeFromOpenList(item) {
-  for (var i = 0; i < openList.length; i++) {
+  for (let i = 0; i < openList.length; i++) {
     if (openList[i] == item){
       openList.splice(i, 1);
     }
@@ -123,8 +139,8 @@ function removeFromOpenList(item) {
 }
 
 function getBestOpen() {
-  var bestI = 0;
-  for (var i = 0; i < openList.length; i++) {
+  let bestI = 0;
+  for (let i = 0; i < openList.length; i++) {
     if (openList[i].hCost < openList[bestI].hCost) {
       bestI = i;
     }
@@ -133,9 +149,9 @@ function getBestOpen() {
 }
 
 function getNeighbors(item) {
-  var neighbors = new Array();
-  var row = item.row;
-  var col = item.col;
+  let neighbors = new Array();
+  let row = item.row;
+  let col = item.col;
 
   if (isNotBlocked(row + 1, col)) neighbors.push(createItem(row+1, col, item));
   if (isNotBlocked(row - 1, col)) neighbors.push(createItem(row - 1, col, item));
@@ -155,14 +171,15 @@ function isNotBlocked(row, col) {
 
 function createItem(row, col, parentItem){
   if(isValid(row, col)){
-    var hCost = getHCost(row, col);
-    var item = new Item(hCost, row, col, parentItem);
+    let hCost = getHCost(row, col);
+    let item = new Item(hCost, row, col, parentItem);
     return item;
   }
+  throw new Error("Please give a valid row and col values!");
 }
 
 function isInOpenList(item){
-  for (var i = 0; i < openList.length; i++) {
+  for (let i = 0; i < openList.length; i++) {
     if (openList[i].row == item.row && openList[i].col == item.col){
       return openList[i];
     }
@@ -171,7 +188,7 @@ function isInOpenList(item){
 }
 
 function isInClosedList(item){
-  for (var i = 0; i < closedList.length; i++) {
+  for (let i = 0; i < closedList.length; i++) {
     if (closedList[i].row == item.row && closedList[i].col == item.col){
       return closedList[i];
     }
@@ -180,7 +197,7 @@ function isInClosedList(item){
 }
 
 function createPath(item) {
-  var madePath = new Array();
+  let madePath = new Array();
   while (item.parent !== 0) {
     madePath.push(item);
     item = item.parent;
@@ -188,16 +205,6 @@ function createPath(item) {
   madePath = madePath.reverse();
   drawPath(madePath);
 }
-
-class Item {
-  constructor(hCost, row, col, parent) {
-    this.hCost = hCost;
-    this.row = row;
-    this.col = col;
-    this.parent = parent;
-  }
-}
-
 
 function drawPath(madePath) {
   console.log("The best path using Best First and the manhatan heuristic is:" );
