@@ -3,7 +3,6 @@ var canvas = document.getElementById("canvas");
 var c = canvas.getContext("2d");
 var boxSize = 30;
 var boxes = Math.floor(600 / boxSize);
-canvas.addEventListener('click', handleClick);
 c.globalAlpha = 0.8
 
 //ROWS AND COLUMNS VARIABLES
@@ -21,82 +20,6 @@ var openList = new Array();
 var blockedItens = new Set();
 var matrix = [];
 
-
-function drawBox() {
-  c.beginPath();
-  c.fillStyle = "white";
-  c.lineWidth = 3;
-  c.strokeStyle = 'black';
-  for (var row = 0; row < boxes; row++) {
-    for (var column = 0; column < boxes; column++) {
-      var x = column * boxSize;
-      var y = row * boxSize;
-      c.rect(x, y, boxSize, boxSize);
-      c.fill();
-      c.stroke();
-    }
-  }
-  c.closePath();
-
-}
-
-function setStart() {
-  typeOfClick = 1;
-}
-
-function setEnd() {
-  typeOfClick = 2;
-}
-
-function setBlocked() {
-  typeOfClick = 3;
-}
-
-function setClear() {
-  location.reload(true);
-}
-
-function startPathfinding() {
-  start(startRow, startCol, destinationRow, destinationCol, blockedItens);
-}
-
-
-function handleClick(e) {
-  if(typeOfClick === 1){
-    c.fillStyle = "red";
-
-    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
-    Math.floor(e.offsetY / boxSize) * boxSize,
-    boxSize, boxSize);
-    startRow = (Math.floor(e.y / boxSize));
-    startCol = (Math.floor(e.x / boxSize));
-  }
-  else if(typeOfClick === 2){
-    c.fillStyle = "yellow";
-
-    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
-    Math.floor(e.offsetY / boxSize) * boxSize,
-    boxSize, boxSize);
-
-    destinationRow = (Math.floor(e.y / boxSize));
-    destinationCol = (Math.floor(e.x / boxSize));
-  }
-  else if(typeOfClick === 3){
-    c.fillStyle = "black";
-
-    c.fillRect(Math.floor(e.offsetX / boxSize) * boxSize,
-    Math.floor(e.offsetY / boxSize) * boxSize,
-    boxSize, boxSize);
-
-    row = (Math.floor(e.y / boxSize));
-    col = (Math.floor(e.x / boxSize));
-    var matrix = [row, col];
-    blockedItens.add(matrix)
-  }
-
-}
-
-drawBox();
 
 function setHasBlockedItem(row, col){
   var blockOrNot = 1;
@@ -128,7 +51,7 @@ function getHCost(row, col) { //MANHATAN HEURISTIC
   return (Math.abs(row - destinationRow) + Math.abs(col - destinationCol));
 }
 
-function start(startR, startC, destinationR, destinationC, blockedI) {
+export function aStarStart(startR, startC, destinationR, destinationC, blockedI) {
   startRow = startR;
   startCol = startC;
   destinationRow = destinationR;
@@ -137,7 +60,7 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
   generateMatrix();
 
   while (openList.length !== 0) {
-    bestItem = getBestOpen();
+    var bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
       createPath(bestItem);
@@ -146,7 +69,7 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
       removeFromOpenList(bestItem);
       insertIntoClosedList(bestItem);
       var neighbors = getNeighbors(bestItem)
-      for (i = 0; i < neighbors.length; i++) {
+      for (var i = 0; i < neighbors.length; i++) {
         var cost = bestItem.gCost + neighbors[i].gCost;
 
         var neighborRecord = isInClosedList(neighbors[i]);
@@ -168,7 +91,7 @@ function start(startR, startC, destinationR, destinationC, blockedI) {
     }
   }
   if(openList.length == 0){
-    return;
+   return;
   }
 }
 
@@ -234,9 +157,9 @@ function isNotBlocked(row, col) {
 
 function createItem(row, col, parentItem){
   if(isValid(row, col)){
-    gCost = parentItem.gCost + 1 || 0;
-    hCost = getHCost(row, col);
-    fCost = gCost + hCost;
+    var gCost = parentItem.gCost + 1 || 0;
+    var hCost = getHCost(row, col);
+    var fCost = gCost + hCost;
     var item = new Item(gCost, hCost, fCost, row, col, parentItem);
     return item;
   }
@@ -262,7 +185,7 @@ function isInClosedList(item){
 }
 
 function createPath(item) {
-  madePath = new Array();
+  var madePath = new Array();
   while (item.parent !== 0) {
     madePath.push(item);
     item = item.parent;
@@ -283,7 +206,7 @@ class Item {
 }
 
 function drawPath(madePath) {
-  console.log("The best path using the manhatan heuristic is:" );
+  console.log("The best path using A * and the manhatan heuristic is:" );
   madePath.map(item => {
     console.log(`Row: ${item.row} | Col: ${item.col}`);
     if(!(item.row == destinationRow && item.col == destinationCol)){
