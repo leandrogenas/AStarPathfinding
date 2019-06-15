@@ -160,29 +160,37 @@ clearPath.addEventListener('click', () => {
 });
 
 function clearAllNodes() {
+  c.globalAlpha = 1;
+  c.fillStyle =  "white";
+  iterableBlockedItens = Array.from(blockedItens);
+
   if(allNodes != undefined) {
     allNodes.map(item => {
-      c.globalAlpha = 1;
-      c.fillStyle =  "white";
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
       c.stroke();
     });
     
-    iterableBlockedItens = Array.from(blockedItens);
     iterableBlockedItens.map(item => {
-      c.fillStyle =  "black";
       c.fillRect(item[1] * boxSize, item[0] * boxSize, boxSize, boxSize);
+      c.stroke();
     });
-
-    c.globalAlpha = 0.8;
-    c.fillStyle = "yellow";
-    c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
-    
-    c.fillStyle = "red";
-    c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
-
-
+    drawAllNodes();
   }
+}
 
+function drawAllNodes() {
+  c.globalAlpha = 0.8;
+  iterableBlockedItens = Array.from(blockedItens);
+
+  iterableBlockedItens.map(item => {
+    c.fillStyle =  "black";
+    c.fillRect(item[1] * boxSize, item[0] * boxSize, boxSize, boxSize);
+  });
+
+  c.fillStyle = "yellow";
+  c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
+  
+  c.fillStyle = "red";
+  c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
 }
 
