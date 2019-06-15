@@ -18,6 +18,7 @@ let startRow;
 //GENERAL VARIABLES
 let typeOfClick;
 let blockedItens = new Set();
+let iterableBlockedItens = new Set();
 let contStart = new Array();
 let contEnd = new Array();
 let endI = 0;
@@ -126,7 +127,7 @@ function handleClick(e) {
     let row = (Math.floor(e.y / boxSize));
     let col = (Math.floor(e.x / boxSize));
     let matrix = [row, col];
-    blockedItens.add(matrix)
+    blockedItens.add(matrix);
   }
 
 }
@@ -159,16 +160,29 @@ clearPath.addEventListener('click', () => {
 });
 
 function clearAllNodes() {
-  allNodes.map(item => {
-    c.fillStyle =  "white";
-    c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
-    c.stroke();
-  });
+  if(allNodes != undefined) {
+    allNodes.map(item => {
+      c.globalAlpha = 1;
+      c.fillStyle =  "white";
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+      c.stroke();
+    });
+    
+    iterableBlockedItens = Array.from(blockedItens);
+    iterableBlockedItens.map(item => {
+      c.fillStyle =  "black";
+      c.fillRect(item[1] * boxSize, item[0] * boxSize, boxSize, boxSize);
+    });
 
-  c.fillStyle = "yellow";
-  c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
-  
-  c.fillStyle = "red";
-  c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
+    c.globalAlpha = 0.8;
+    c.fillStyle = "yellow";
+    c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
+    
+    c.fillStyle = "red";
+    c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
+
+
+  }
+
 }
 

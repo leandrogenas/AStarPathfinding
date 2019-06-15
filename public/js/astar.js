@@ -123,7 +123,6 @@ function insertIntoOpenList(item) {
 
 function insertIntoClosedList(item) {
   closedList.push(item);
-  console.log("added into closed list: ", item);
 }
 
 
