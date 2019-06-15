@@ -7,7 +7,7 @@ let c = canvas.getContext("2d");
 let boxSize = 30;
 let boxes = Math.floor(600 / boxSize);
 canvas.addEventListener('click', handleClick);
-c.globalAlpha = 0.8
+c.globalAlpha = 0.8;
 
 //ROWS AND COLUMNS VARIABLES
 let destinationRow;
@@ -22,6 +22,7 @@ let contStart = new Array();
 let contEnd = new Array();
 let endI = 0;
 let startI = 0;
+let allNodes;
 
 function drawBox() {
   c.beginPath();
@@ -134,10 +135,40 @@ drawBox();
 
 const buttonBestFirst = document.getElementById('bestFirst');
 buttonBestFirst.addEventListener('click', () => {
-  bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  if(allNodes == undefined) {
+    allNodes = bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  } else {
+    clearAllNodes();
+    allNodes = bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  }
 });
 
 const buttonAStar = document.getElementById('aStar');
 buttonAStar.addEventListener('click', () => {
-  aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  if(allNodes == undefined) {
+    allNodes = aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  } else {
+    clearAllNodes();
+    allNodes = aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  }
 });
+
+const clearPath = document.getElementById('clearMadePath');
+clearPath.addEventListener('click', () => {
+  clearAllNodes();
+});
+
+function clearAllNodes() {
+  allNodes.map(item => {
+    c.fillStyle =  "white";
+    c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+    c.stroke();
+  });
+
+  c.fillStyle = "yellow";
+  c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
+  
+  c.fillStyle = "red";
+  c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
+}
+
