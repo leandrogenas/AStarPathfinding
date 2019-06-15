@@ -5,6 +5,8 @@ Pathfinding Algorithm Visualization
 <br>
 
 Steps to run: <br>
+  Browse to downloaded folder in console<br>
+  In console type: npm i<br>
   In console type: node server.js<br>
   Open http://localhost:8081 <br>
   Enjoy!
