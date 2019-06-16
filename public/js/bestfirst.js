@@ -2,7 +2,7 @@
 let canvas = document.getElementById("canvas");
 let c = canvas.getContext("2d")
 let boxSize = 30;
-c.globalAlpha = 0.2
+c.globalAlpha = 0.8;
 
 //ROWS AND COLUMNS VARIABLES
 let ROW = 20;
@@ -17,6 +17,7 @@ let closedList = new Array();
 let openList = new Array();
 let blockedItens = new Set();
 let matrix = [];
+let allNodes;
 
 //ITEM CLASS
 class Item {
@@ -73,9 +74,8 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
     let bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
+      allNodes =  [...new Set([...openList, ...closedList])];
       createPath(bestItem);
-      openList = new Array();
-      closedList = new Array();
       break;
     } else if (isNotBlocked(bestItem.row, bestItem.col)) {
       removeFromOpenList(bestItem);
@@ -105,8 +105,7 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
       return;
     }
   }
-
-
+  return allNodes;
 }
 
 
@@ -219,18 +218,18 @@ function drawPath(madePath) {
 
   closedList.map(item => {
     if(!madePath.includes(item) && !(item.row == startRow && item.col == startCol)){
-      c.fillStyle = "green";//"rgb(128,128,0)";
+      c.fillStyle = "green";
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
     }
   });
 
   openList.map(item => {
     if(!madePath.includes(item)){
-      c.fillStyle =  "purple";// "rgb(34,139,34)";
+      c.fillStyle =  "purple";
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
     }
   });
-  closedList = new Array();
   openList = new Array();
+  closedList = new Array();
   return;
 }

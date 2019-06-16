@@ -2,7 +2,7 @@
 let canvas = document.getElementById("canvas");
 let c = canvas.getContext("2d")
 let boxSize = 30;
-c.globalAlpha = 0.8
+c.globalAlpha = 0.8;
 
 //ROWS AND COLUMNS VARIABLES
 let ROW = 20;
@@ -17,6 +17,7 @@ let closedList = new Array();
 let openList = new Array();
 let blockedItens = new Set();
 let matrix = [];
+let allNodes;
 
 //ITEM CLASS
 class Item {
@@ -56,7 +57,6 @@ function generateMatrix() {
 }
 
 function getHCost(row, col) { //MANHATAN HEURISTIC
-  //return Math.floor((Math.sqrt((row - destinationRow) * (row - destinationRow) + (col - destinationCol) * (col - destinationCol)))); EUCLIDEAN
   return (Math.abs(row - destinationRow) + Math.abs(col - destinationCol));
 }
 
@@ -72,6 +72,7 @@ export function aStarStart(startR, startC, destinationR, destinationC, blockedI)
     let bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
+      allNodes =  [...new Set([...openList, ...closedList])];
       createPath(bestItem);
       break;
     } else if (isValid(bestItem.row, bestItem.col) && isNotBlocked(bestItem.row, bestItem.col)) {
@@ -100,10 +101,10 @@ export function aStarStart(startR, startC, destinationR, destinationC, blockedI)
     }
     if(openList.length == 0){
       console.log("Couldn't find a path with a star");
-     return;
+      return;
     }
   }
-
+  return allNodes;
 }
 
 
@@ -118,12 +119,10 @@ function isDestination(row, col) {
 
 function insertIntoOpenList(item) {
   openList.push(item);
-
 }
 
 function insertIntoClosedList(item) {
   closedList.push(item);
-
 }
 
 
@@ -215,7 +214,7 @@ function drawPath(madePath) {
     }
 
   });
-
+ 
   closedList.map(item => {
     if(!madePath.includes(item) && !(item.row == startRow && item.col == startCol)){
       c.fillStyle = "green";
@@ -229,7 +228,7 @@ function drawPath(madePath) {
       c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
     }
   });
-  closedList = new Array();
   openList = new Array();
+  closedList = new Array();
   return;
 }

@@ -7,7 +7,7 @@ let c = canvas.getContext("2d");
 let boxSize = 30;
 let boxes = Math.floor(600 / boxSize);
 canvas.addEventListener('click', handleClick);
-c.globalAlpha = 0.8
+c.globalAlpha = 0.8;
 
 //ROWS AND COLUMNS VARIABLES
 let destinationRow;
@@ -18,10 +18,12 @@ let startRow;
 //GENERAL VARIABLES
 let typeOfClick;
 let blockedItens = new Set();
+let iterableBlockedItens = new Set();
 let contStart = new Array();
 let contEnd = new Array();
 let endI = 0;
 let startI = 0;
+let allNodes;
 
 function drawBox() {
   c.beginPath();
@@ -125,7 +127,7 @@ function handleClick(e) {
     let row = (Math.floor(e.y / boxSize));
     let col = (Math.floor(e.x / boxSize));
     let matrix = [row, col];
-    blockedItens.add(matrix)
+    blockedItens.add(matrix);
   }
 
 }
@@ -134,10 +136,61 @@ drawBox();
 
 const buttonBestFirst = document.getElementById('bestFirst');
 buttonBestFirst.addEventListener('click', () => {
-  bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  if(allNodes == undefined) {
+    allNodes = bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  } else {
+    clearAllNodes();
+    allNodes = bestFirstStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  }
 });
 
 const buttonAStar = document.getElementById('aStar');
 buttonAStar.addEventListener('click', () => {
-  aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  if(allNodes == undefined) {
+    allNodes = aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  } else {
+    clearAllNodes();
+    allNodes = aStarStart(startRow, startCol, destinationRow, destinationCol, blockedItens);
+  }
 });
+
+const clearPath = document.getElementById('clearMadePath');
+clearPath.addEventListener('click', () => {
+  clearAllNodes();
+});
+
+function clearAllNodes() {
+  c.globalAlpha = 1;
+  c.fillStyle =  "white";
+  iterableBlockedItens = Array.from(blockedItens);
+
+  if(allNodes != undefined) {
+    allNodes.map(item => {
+      c.fillRect(item.col * boxSize, item.row * boxSize, boxSize, boxSize);
+      c.stroke();
+    });
+    
+    iterableBlockedItens.map(item => {
+      c.fillRect(item[1] * boxSize, item[0] * boxSize, boxSize, boxSize);
+      c.stroke();
+    });
+    drawAllNodes();
+  }
+}
+
+function drawAllNodes() {
+  c.globalAlpha = 0.8;
+  iterableBlockedItens = Array.from(blockedItens);
+
+  iterableBlockedItens.map(item => {
+    c.fillStyle =  "black";
+    c.fillRect(item[1] * boxSize, item[0] * boxSize, boxSize, boxSize);
+  });
+
+  c.fillStyle = "yellow";
+  c.fillRect(destinationCol * boxSize, destinationRow * boxSize, boxSize, boxSize);
+  
+  c.fillStyle = "red";
+  c.fillRect(startCol * boxSize, startRow * boxSize, boxSize, boxSize);
+}
+
