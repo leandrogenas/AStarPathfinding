@@ -68,7 +68,7 @@ export function aStarStart(startR, startC, destinationR, destinationC, blockedI)
   blockedItens = blockedI;
   generateMatrix();
 
-  while (openList.length !== 0) {
+  while (openList.length != 0) {
     let bestItem = getBestOpen();
     if (isDestination(bestItem.row, bestItem.col)) {
       console.log("Finished, found destination");
@@ -116,12 +116,13 @@ function isDestination(row, col) {
   return (row == destinationRow && col == destinationCol);
 }
 
-
 function insertIntoOpenList(item) {
+  console.log("Inserted into open list:", item);
   openList.push(item);
 }
 
 function insertIntoClosedList(item) {
+  console.log("Inserted into closed list:", item);
   closedList.push(item);
 }
 
