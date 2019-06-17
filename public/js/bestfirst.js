@@ -119,13 +119,13 @@ function isDestination(row, col) {
 
 
 function insertIntoOpenList(item) {
+  console.log("Inserted into open list:", item);
   openList.push(item);
-
 }
 
 function insertIntoClosedList(item) {
+  console.log("Inserted into closed list:", item);
   closedList.push(item);
-
 }
 
 
