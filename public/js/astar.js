@@ -75,26 +75,26 @@ export function aStarStart(startR, startC, destinationR, destinationC, blockedI)
       allNodes =  [...new Set([...openList, ...closedList])];
       createPath(bestItem);
       break;
-    } else if (isValid(bestItem.row, bestItem.col) && isNotBlocked(bestItem.row, bestItem.col)) {
-      removeFromOpenList(bestItem);
-      insertIntoClosedList(bestItem);
-      let neighbors = getNeighbors(bestItem)
-      for (let i = 0; i < neighbors.length; i++) {
-        let cost = bestItem.gCost + neighbors[i].gCost;
+    }
 
-        let neighborRecord = isInClosedList(neighbors[i]);
-        if (neighborRecord && cost >= neighborRecord.gCost){
-          continue;
-        }
+    removeFromOpenList(bestItem);
+    insertIntoClosedList(bestItem);
+    let neighbors = getNeighbors(bestItem)
+    for (let i = 0; i < neighbors.length; i++) {
+      let cost = bestItem.gCost + neighbors[i].gCost;
 
-        neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord) {
-          insertIntoOpenList(neighbors[i]);
-        } else if (cost < neighborRecord.gCost) {
-          neighborRecord.parent = bestItem;
-          neighborRecord.gCost = cost;
-          neighborRecord.fCost = cost + neighborRecord.hCost;
-        }
+      let neighborRecord = isInClosedList(neighbors[i]);
+      if (neighborRecord && cost >= neighborRecord.gCost){
+        continue;
+      }
+
+      neighborRecord = isInOpenList(neighbors[i]);
+      if (!neighborRecord) {
+        insertIntoOpenList(neighbors[i]);
+      } else if (cost < neighborRecord.gCost) {
+        neighborRecord.parent = bestItem;
+        neighborRecord.gCost = cost;
+        neighborRecord.fCost = cost + neighborRecord.hCost;
       }
     }
     if(openList.length == 0){
