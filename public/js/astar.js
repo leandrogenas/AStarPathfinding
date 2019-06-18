@@ -88,14 +88,12 @@ export function aStarStart(startR, startC, destinationR, destinationC, blockedI)
         }
 
         neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord || cost < neighborRecord.gCost) {
-          if (!neighborRecord) {
-            insertIntoOpenList(neighbors[i]);
-          } else {
-            neighborRecord.parent = bestItem;
-            neighborRecord.gCost = cost;
-            neighborRecord.fCost = cost + neighborRecord.hCost;
-          }
+        if (!neighborRecord) {
+          insertIntoOpenList(neighbors[i]);
+        } else if (cost < neighborRecord.gCost) {
+          neighborRecord.parent = bestItem;
+          neighborRecord.gCost = cost;
+          neighborRecord.fCost = cost + neighborRecord.hCost;
         }
       }
     }
@@ -215,7 +213,7 @@ function drawPath(madePath) {
     }
 
   });
- 
+
   closedList.map(item => {
     if(!madePath.includes(item) && !(item.row == startRow && item.col == startCol)){
       c.fillStyle = "green";

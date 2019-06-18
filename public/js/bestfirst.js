@@ -90,13 +90,11 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
         }
 
         neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord || cost < neighborRecord.hCost) {
-          if (!neighborRecord) {
-            insertIntoOpenList(neighbors[i]);
-          } else {
-            neighborRecord.parent = bestItem;
-            neighborRecord.hCost = cost + neighborRecord.hCost;
-          }
+        if (!neighborRecord) {
+          insertIntoOpenList(neighbors[i]);
+        } else if (cost < neighborRecord.hCost) {
+          neighborRecord.parent = bestItem;
+          neighborRecord.hCost = cost + neighborRecord.hCost;
         }
       }
     }
