@@ -77,27 +77,25 @@ export function bestFirstStart(startR, startC, destinationR, destinationC, block
       allNodes =  [...new Set([...openList, ...closedList])];
       createPath(bestItem);
       break;
-    } else if (isNotBlocked(bestItem.row, bestItem.col)) {
-      removeFromOpenList(bestItem);
-      insertIntoClosedList(bestItem);
-      let neighbors = getNeighbors(bestItem)
-      for (let i = 0; i < neighbors.length; i++) {
-        let cost = bestItem.hCost + neighbors[i].hCost;
+    }
 
-        let neighborRecord = isInClosedList(neighbors[i]);
-        if (neighborRecord && cost >= neighborRecord.hCost){
-          continue;
-        }
+    removeFromOpenList(bestItem);
+    insertIntoClosedList(bestItem);
+    let neighbors = getNeighbors(bestItem)
+    for (let i = 0; i < neighbors.length; i++) {
+      let cost = bestItem.hCost + neighbors[i].hCost;
 
-        neighborRecord = isInOpenList(neighbors[i]);
-        if (!neighborRecord || cost < neighborRecord.hCost) {
-          if (!neighborRecord) {
-            insertIntoOpenList(neighbors[i]);
-          } else {
-            neighborRecord.parent = bestItem;
-            neighborRecord.hCost = cost + neighborRecord.hCost;
-          }
-        }
+      let neighborRecord = isInClosedList(neighbors[i]);
+      if (neighborRecord && cost >= neighborRecord.hCost){
+        continue;
+      }
+
+      neighborRecord = isInOpenList(neighbors[i]);
+      if (!neighborRecord) {
+        insertIntoOpenList(neighbors[i]);
+      } else if (cost < neighborRecord.hCost) {
+        neighborRecord.parent = bestItem;
+        neighborRecord.hCost = cost + neighborRecord.hCost;
       }
     }
     if(openList.length == 0){
