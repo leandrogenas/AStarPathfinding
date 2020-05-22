@@ -1,5 +1,5 @@
 {
-  "name": "TesteBestFirstSearch",
+  "name": "MelhorCaminhoAStar",
   "version": "1.0.0",
   "description": "",
   "main": "controller.js",

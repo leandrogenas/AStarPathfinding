@@ -5,8 +5,8 @@ let boxSize = 30;
 c.globalAlpha = 0.8;
 
 //ROWS AND COLUMNS VARIABLES
-let ROW = 20;
-let COL = 20;
+let ROW = 40;
+let COL = 40;
 let destinationRow;
 let destinationCol;
 let startCol;

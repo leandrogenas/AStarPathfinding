@@ -5,7 +5,7 @@ import { bestFirstStart } from "./bestfirst.js";
 let canvas = document.getElementById("canvas");
 let c = canvas.getContext("2d");
 let boxSize = 30;
-let boxes = Math.floor(600 / boxSize);
+let boxes = 40;
 canvas.addEventListener('click', handleClick);
 c.globalAlpha = 0.8;
 
@@ -24,6 +24,8 @@ let contEnd = new Array();
 let endI = 0;
 let startI = 0;
 let allNodes;
+
+
 
 function drawBox() {
   c.beginPath();
